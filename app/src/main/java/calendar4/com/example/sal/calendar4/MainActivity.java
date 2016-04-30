@@ -65,6 +65,7 @@ public class MainActivity extends AppCompatActivity
 
     private int mHour;
     private int mMinute;
+    private int sample;
 
     //send json request and receive it
     //private HttpClient jsonClient;
