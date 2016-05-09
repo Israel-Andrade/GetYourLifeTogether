@@ -1,17 +1,24 @@
 package calendar4.com.example.sal.calendar4;
 
+import android.Manifest;
 import android.app.Dialog;
 import android.app.Notification;
 import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
+import android.content.ContentResolver;
+import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
+import android.content.pm.PackageManager;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.CalendarContract;
 import android.service.notification.NotificationListenerService;
 import android.support.design.widget.FloatingActionButton;
 import android.support.design.widget.Snackbar;
+import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.DialogFragment;
 import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.TaskStackBuilder;
@@ -43,6 +50,7 @@ import java.net.HttpRetryException;
 import java.net.URL;
 import java.text.SimpleDateFormat;
 import java.util.Calendar;
+import java.util.TimeZone;
 
 import org.apache.http.client.HttpClient;
 import org.apache.http.client.ResponseHandler;
@@ -67,20 +75,9 @@ public class MainActivity extends AppCompatActivity
     private int mMinute;
     private int sample;
 
-    //send json request and receive it
-    //private HttpClient jsonClient;
 
-    public void getJson() {
-        HttpGet get = new HttpGet("http://api.openweathermap.org/data/2.5/weather?q=London,uk&appid=20957c38b0b69d6a71018e2678cac8b1");
-        sendHeadsUpNotification(get.toString());
-        Log.v("HTTP",get.toString() );
-    }
-    public void getInput(){
 
-    }
     public void showCustomDialog(){
-
-
 
         // custom dialog
         final Dialog dialog = new Dialog(context);
@@ -112,16 +109,83 @@ public class MainActivity extends AppCompatActivity
 
         Log.d("something", String.valueOf(hour));
 
-        //int hour = timePicker.getCurrentHour();
+        // force the timepicker to loose focus and the typed value is available !
+        //timePicker.clearFocus();
+        // re-read the values, in my case i put them in a Time object.
+        //time.hour   = timePicker.getCurrentHour();
+        //time.minute = timePicker.getCurrentMinute();
+
         dialog.show();
 
-        sendHeadsUpNotification(Integer.toString(day));
+        //int hour = timePicker.getCurrentHour();
+        sendHeadsUpNotification(Integer.toString(hour));
     }
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
+
+    //adds a calendar event dynamically
+    public void addCalendarEvent2() {
+        Uri uri2 = CalendarContract.Calendars.CONTENT_URI;
+        String[] projection = new String[]{
+                CalendarContract.Calendars._ID,
+                CalendarContract.Calendars.ACCOUNT_NAME,
+                CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
+                CalendarContract.Calendars.NAME,
+                CalendarContract.Calendars.CALENDAR_COLOR
+        };
+
+        Cursor calendarCursor = managedQuery( uri2, projection, null, null, null );
+
+        // Construct event details
+        long startMillis = 0;
+        long endMillis = 0;
+        Calendar beginTime = Calendar.getInstance();
+        //year, month day, hour of day, minute, second
+        beginTime.set( 2016, 9, 14, 7, 30 );
+        startMillis = beginTime.getTimeInMillis();
+        Calendar endTime = Calendar.getInstance();
+        endTime.set( 2016, 9, 14, 8, 45 );
+        endMillis = endTime.getTimeInMillis();
+
+// Insert Event
+        Calendar cal = Calendar.getInstance();
+
+        ContentResolver cr = getContentResolver();
+        ContentValues values = new ContentValues();
+        TimeZone timeZone = TimeZone.getDefault();
+
+        //use startMillis
+        //use endMillis
+        values.put( CalendarContract.Events.DTSTART, cal.getTimeInMillis() );
+        values.put( CalendarContract.Events.DTEND, cal.getTimeInMillis() + 60 * 60 * 1000 );
+        values.put( CalendarContract.Events.EVENT_TIMEZONE, timeZone.getID() );
+        values.put( CalendarContract.Events.TITLE, "Walk The Dog" );
+        values.put( CalendarContract.Events.DESCRIPTION, "My dog is bored, so we're going on a really long walk!" );
+        values.put( CalendarContract.Events.EVENT_LOCATION, "CSUMB" );
+        values.put( CalendarContract.Events.CALENDAR_ID, 1 );
+
+        //Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
+        //Uri uri = cr.insert( Uri.parse( "content://com.android.calendar/events" ), values );
+        if (ActivityCompat.checkSelfPermission( this, Manifest.permission.WRITE_CALENDAR ) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        Uri uri = cr.insert( CalendarContract.Events.CONTENT_URI, values );
+
+// Retrieve ID for new event
+        String eventID = uri.getLastPathSegment();
+
+        Log.v("EVENTID", eventID);
+    }
 
     public void addCalendarEvent(){
         Calendar cal = Calendar.getInstance();
@@ -193,7 +257,8 @@ public class MainActivity extends AppCompatActivity
         DialogFragment newFragment = new TimePickerFragment();
         newFragment.show(getSupportFragmentManager(), "timePicker");
     }
-
+    String temp;
+    //timepickerFragment
     public static class TimePickerFragment extends DialogFragment
             implements TimePickerDialog.OnTimeSetListener {
 
@@ -214,7 +279,16 @@ public class MainActivity extends AppCompatActivity
 
         public void onTimeSet(TimePicker view, int hourOfDay, int minute) {
             // Do something with the time chosen by the user
+            Log.v("HOUR", String.valueOf(hourOfDay));
+            Log.v("MINUTE", String.valueOf(minute));
 
+
+
+            /*
+            MainActivity test = new MainActivity();
+
+            test.sendHeadsUpNotification(String.valueOf(hourOfDay));
+            */
         }
     }
     @Override
@@ -306,7 +380,7 @@ public class MainActivity extends AppCompatActivity
             showCustomDialog();
 
         } else if (id == R.id.nav_send) {
-            getJson();
+            addCalendarEvent2();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
