@@ -3,33 +3,33 @@
 
     <group android:checkableBehavior="single">
         <item
-            android:id="@+id/nav_camera"
+            android:id="@+id/map"
             android:icon="@drawable/ic_menu_camera"
-            android:title="Import" />
+            android:title="Map" />
         <item
-            android:id="@+id/nav_gallery"
+            android:id="@+id/weather"
             android:icon="@drawable/ic_menu_gallery"
-            android:title="Gallery" />
+            android:title="Weather" />
         <item
-            android:id="@+id/nav_slideshow"
+            android:id="@+id/addEventPrompt"
             android:icon="@drawable/ic_menu_slideshow"
-            android:title="Slideshow" />
+            android:title="Add event w/Prompt" />
         <item
-            android:id="@+id/nav_manage"
+            android:id="@+id/customDialog"
             android:icon="@drawable/ic_menu_manage"
-            android:title="Tools" />
+            android:title="Custom Dialog" />
     </group>
 
     <item android:title="Communicate">
         <menu>
             <item
-                android:id="@+id/nav_share"
+                android:id="@+id/addEventDynamically"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Share" />
+                android:title="Add Event Dynamically" />
             <item
-                android:id="@+id/nav_send"
+                android:id="@+id/update"
                 android:icon="@drawable/ic_menu_send"
-                android:title="Send" />
+                android:title="Update Event" />
         </menu>
     </item>
 
