@@ -7,6 +7,7 @@ import android.app.NotificationManager;
 import android.app.PendingIntent;
 import android.app.TimePickerDialog;
 import android.content.ContentResolver;
+import android.content.ContentUris;
 import android.content.ContentValues;
 import android.content.Context;
 import android.content.Intent;
@@ -42,21 +43,9 @@ import android.widget.TimePicker;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
-
-import org.apache.http.params.HttpParams;
-import org.json.JSONObject;
-
-import java.net.HttpRetryException;
-import java.net.URL;
-import java.text.SimpleDateFormat;
 import java.util.Calendar;
 import java.util.TimeZone;
 
-import org.apache.http.client.HttpClient;
-import org.apache.http.client.ResponseHandler;
-import org.apache.http.client.methods.HttpGet;
-import org.apache.http.impl.client.BasicResponseHandler;
-import org.apache.http.impl.client.DefaultHttpClient;
 
 
 public class MainActivity extends AppCompatActivity
@@ -75,6 +64,8 @@ public class MainActivity extends AppCompatActivity
     private int mMinute;
     private int sample;
 
+
+    private long THEEVENT = 0;
 
 
     public void showCustomDialog(){
@@ -118,7 +109,7 @@ public class MainActivity extends AppCompatActivity
         dialog.show();
 
         //int hour = timePicker.getCurrentHour();
-        sendHeadsUpNotification(Integer.toString(hour));
+        sendHeadsUpNotification(Integer.toString(hour), Integer.toString(minute));
     }
     /**
      * ATTENTION: This was auto-generated to implement the App Indexing API.
@@ -128,6 +119,10 @@ public class MainActivity extends AppCompatActivity
 
     //adds a calendar event dynamically
     public void addCalendarEvent2() {
+///
+
+   ///
+        //gets the calendar
         Uri uri2 = CalendarContract.Calendars.CONTENT_URI;
         String[] projection = new String[]{
                 CalendarContract.Calendars._ID,
@@ -137,7 +132,10 @@ public class MainActivity extends AppCompatActivity
                 CalendarContract.Calendars.CALENDAR_COLOR
         };
 
+        //use this to get calendar event IDs
         Cursor calendarCursor = managedQuery( uri2, projection, null, null, null );
+
+
 
         // Construct event details
         long startMillis = 0;
@@ -149,6 +147,7 @@ public class MainActivity extends AppCompatActivity
         Calendar endTime = Calendar.getInstance();
         endTime.set( 2016, 9, 14, 8, 45 );
         endMillis = endTime.getTimeInMillis();
+
 
 // Insert Event
         Calendar cal = Calendar.getInstance();
@@ -162,10 +161,11 @@ public class MainActivity extends AppCompatActivity
         values.put( CalendarContract.Events.DTSTART, cal.getTimeInMillis() );
         values.put( CalendarContract.Events.DTEND, cal.getTimeInMillis() + 60 * 60 * 1000 );
         values.put( CalendarContract.Events.EVENT_TIMEZONE, timeZone.getID() );
-        values.put( CalendarContract.Events.TITLE, "Walk The Dog" );
-        values.put( CalendarContract.Events.DESCRIPTION, "My dog is bored, so we're going on a really long walk!" );
+        values.put( CalendarContract.Events.TITLE, "Don't stress out "+ String.valueOf(cal.getTimeInMillis()) );
+        values.put( CalendarContract.Events.DESCRIPTION, "Eat all the Pizza" );
         values.put( CalendarContract.Events.EVENT_LOCATION, "CSUMB" );
         values.put( CalendarContract.Events.CALENDAR_ID, 1 );
+
 
         //Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
         //Uri uri = cr.insert( Uri.parse( "content://com.android.calendar/events" ), values );
@@ -179,14 +179,42 @@ public class MainActivity extends AppCompatActivity
             // for ActivityCompat#requestPermissions for more details.
             return;
         }
+        //inserts the event
         Uri uri = cr.insert( CalendarContract.Events.CONTENT_URI, values );
 
-// Retrieve ID for new event
-        String eventID = uri.getLastPathSegment();
+        // Retrieve ID for new event
+        String eventIDString = uri.getLastPathSegment();
+        long eventID = Long.parseLong(uri.getLastPathSegment());
 
-        Log.v("EVENTID", eventID);
+        THEEVENT = eventID;
+
+        Log.v("EVENTID", eventIDString);
+
+
+        //updateEvent(eventID);
     }
 
+    //updates an event based on the event ID (long)
+    public void updateEvent(long eventID){
+
+        Calendar cal = Calendar.getInstance();
+
+        ContentResolver cr = getContentResolver();
+        ContentValues values = new ContentValues();
+        Uri updateUri = null;
+// The new title for the event
+        values.put(CalendarContract.Events.TITLE, "Kickboxing UPDATE");
+        //will update by 30 mins
+        values.put(CalendarContract.Events.DTSTART, cal.getTimeInMillis() + 15 * 60 * 1000);
+
+        updateUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventID);
+        int rows = getContentResolver().update(updateUri, values, null, null);
+
+        Log.v("ROW UPDATE", "Rows updated: " + rows);
+        Log.v("UPDATED EVENT ", String.valueOf(eventID));
+
+        sendHeadsUpNotification("UPDATE", String.valueOf(eventID) );
+    }
     public void addCalendarEvent(){
         Calendar cal = Calendar.getInstance();
         Intent intent = new Intent(Intent.ACTION_EDIT);
@@ -198,13 +226,13 @@ public class MainActivity extends AppCompatActivity
         intent.putExtra("title", "A Test Event from android app");
         startActivity(intent);
     }
-    public void sendHeadsUpNotification(String arg) {
+    public void sendHeadsUpNotification(String arg, String arg2) {
         //build notification
         NotificationCompat.Builder builder =
                 new NotificationCompat.Builder(this)
                         .setSmallIcon(R.drawable.ic_menu_send)
-                        .setContentTitle("Ping Notification")
-                        .setContentText(arg)
+                        .setContentTitle(arg)
+                        .setContentText(arg2)
                         .setDefaults(Notification.DEFAULT_ALL) // must requires VIBRATE permission
                         .setPriority(NotificationCompat.PRIORITY_HIGH); //must give priority to High, Max which will considered as heads-up notification4
 /*
@@ -287,17 +315,17 @@ public class MainActivity extends AppCompatActivity
             /*
             MainActivity test = new MainActivity();
 
-            test.sendHeadsUpNotification(String.valueOf(hourOfDay));
+            test.sendHeadsUpNotification(String.valueOf(hourOfDay),String.valueOf(minute) );
             */
         }
     }
     @Override
     protected void onCreate(Bundle savedInstanceState) {
 
-        final String httpPath = "http://api.openweathermap.org/data/2.5/weather?q=92154&appid=20957c38b0b69d6a71018e2678cac8b1";
-
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_main);
+
+
         Toolbar toolbar = (Toolbar) findViewById(R.id.toolbar);
         setSupportActionBar(toolbar);
 
@@ -364,23 +392,27 @@ public class MainActivity extends AppCompatActivity
         // Handle navigation view item clicks here.
         int id = item.getItemId();
 
-        if (id == R.id.nav_camera) {
-            sendNotification();
+        if (id == R.id.map) {
+            //map activity will be called from here
+            //sendNotification();
             // Handle the camera action
-        } else if (id == R.id.nav_gallery) {
-            sendHeadsUpNotification("hola");
+        } else if (id == R.id.weather) {
+            //weather application will be sent from here
+            //sendHeadsUpNotification("hola");
 
-        } else if (id == R.id.nav_slideshow) {
-            showTimePickerDialog();
-
-        } else if (id == R.id.nav_manage) {
+        } else if (id == R.id.addEventPrompt) {
             addCalendarEvent();
+            //showTimePickerDialog();
 
-        } else if (id == R.id.nav_share) {
+        } else if (id == R.id.customDialog) {
             showCustomDialog();
-
-        } else if (id == R.id.nav_send) {
+        } else if (id == R.id.addEventDynamically) {
             addCalendarEvent2();
+
+        } else if (id == R.id.update) {
+            Log.v("THE EVENT ID", String.valueOf(THEEVENT));
+            updateEvent(THEEVENT);
+            //showTimePickerDialog();
         }
 
         DrawerLayout drawer = (DrawerLayout) findViewById(R.id.drawer_layout);
