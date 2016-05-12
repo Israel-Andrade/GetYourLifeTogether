@@ -56,6 +56,17 @@ public class MapsActivity extends FragmentActivity {
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
         }
     }
+    public void onZoom(View view)
+    {
+        if(view.getId()== R.id.Bzoomin)
+        {
+            mMap.animateCamera(CameraUpdateFactory.zoomIn());
+        }
+        if(view.getId() == R.id.Bzoomout)
+        {
+            mMap.animateCamera(CameraUpdateFactory.zoomOut());
+        }
+    }
 
     public void changeType(View view)
     {
@@ -77,7 +88,7 @@ public class MapsActivity extends FragmentActivity {
     }
 
     private void setUpMap() {
-        mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
+        //mMap.addMarker(new MarkerOptions().position(new LatLng(0, 0)).title("Marker"));
         mMap.setMyLocationEnabled(true);
     }
 }
