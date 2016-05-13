@@ -20,7 +20,7 @@
             android:title="Custom Dialog" />
         <item
             android:id="@+id/showTimePicker"
-            android:icon="@drawable/ic_cast_light"
+            android:icon="@drawable/icon_17"
             android:title="showTimePicker" />
     </group>
 
@@ -31,9 +31,17 @@
                 android:icon="@drawable/ic_menu_share"
                 android:title="Delete Event" />
             <item
-                android:id="@+id/update"
+                android:id="@+id/update15"
                 android:icon="@drawable/ic_menu_send"
-                android:title="Update Event" />
+                android:title="Update Event by 15 mins" />
+            <item
+                android:id="@+id/update30"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Update Event by 30 mins" />
+            <item
+                android:id="@+id/update45"
+                android:icon="@drawable/ic_menu_send"
+                android:title="Update Event by 45 mins" />
         </menu>
     </item>
 

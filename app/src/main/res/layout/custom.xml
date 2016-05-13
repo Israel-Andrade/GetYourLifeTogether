@@ -24,24 +24,18 @@
         android:text=" Ok "
         android:layout_marginRight="5dp"
         android:layout_alignParentBottom="true"
-        android:layout_alignParentStart="true" />
+        android:layout_toStartOf="@+id/timeNeeded" />
 
     <Switch
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
         android:text="Eliminate"
         android:id="@+id/switch1"
-        android:layout_alignTop="@+id/spinner"
-        android:layout_centerHorizontal="true" />
-
-    <Spinner
-        android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
-        android:id="@+id/spinner"
-        android:spinnerMode="dialog"
-        android:layout_below="@+id/text"
-        android:layout_alignParentStart="true"
-        android:focusable="true" />
+        android:layout_alignTop="@+id/dialogButtonOK"
+        android:layout_toEndOf="@+id/timeNeeded"
+        android:layout_alignParentBottom="true"
+        android:checked="true"
+        android:textAlignment="center" />
 
     <TimePicker
         android:layout_width="wrap_content"
@@ -57,8 +51,7 @@
         android:textAppearance="?android:attr/textAppearanceLarge"
         android:text="Postpone until:"
         android:id="@+id/timeNeeded"
-        android:layout_below="@+id/spinner"
-        android:layout_alignParentStart="true"
-        android:layout_alignEnd="@+id/switch1" />
+        android:layout_below="@+id/text"
+        android:layout_centerHorizontal="true" />
 
 </RelativeLayout>
