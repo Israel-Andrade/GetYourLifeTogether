@@ -20,7 +20,7 @@
             android:title="Custom Dialog" />
         <item
             android:id="@+id/showTimePicker"
-            android:icon="@drawable/icon_17"
+            android:icon="@drawable/ic_media_route_disabled_mono_dark"
             android:title="showTimePicker" />
     </group>
 
