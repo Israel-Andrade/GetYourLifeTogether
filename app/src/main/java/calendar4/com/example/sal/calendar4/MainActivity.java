@@ -1,5 +1,6 @@
 package calendar4.com.example.sal.calendar4;
 
+//look at all these beautiful imports :3
 import android.Manifest;
 import android.app.Dialog;
 import android.app.Notification;
@@ -13,7 +14,6 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
-
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
