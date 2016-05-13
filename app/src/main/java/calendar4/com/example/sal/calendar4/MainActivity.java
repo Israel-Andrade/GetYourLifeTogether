@@ -13,11 +13,14 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+
 import android.location.Address;
 import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.BaseColumns;
+import android.net.Uri;
+import android.os.Bundle;
 import android.provider.CalendarContract;
 import android.service.notification.NotificationListenerService;
 import android.support.design.widget.FloatingActionButton;
@@ -47,10 +50,12 @@ import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
 
+
 import java.io.IOException;
 import java.util.Calendar;
 import java.util.List;
 import java.util.Locale;
+import java.util.Calendar;
 import java.util.TimeZone;
 
 
@@ -70,6 +75,7 @@ public class MainActivity extends AppCompatActivity
     private int mHour;
     private int mMinute;
     private int sample;
+
 
     static int hourFromTP = 0;
     static int minutesFromTP = 0;
@@ -181,6 +187,9 @@ public class MainActivity extends AppCompatActivity
         */
     }
 
+
+
+
     public void getCoordinatesOfPlace(){
         Geocoder geocoder = new Geocoder(getApplicationContext().getApplicationContext(), Locale.US);
         List<Address> listOfAddress;
@@ -234,6 +243,7 @@ public class MainActivity extends AppCompatActivity
      * See https://g.co/AppIndexing/AndroidStudio for more information.
      */
     private GoogleApiClient client;
+
 
     public void addCalendarEvent3(int start) {
         start = this.minutesFromTP;
@@ -320,6 +330,7 @@ public class MainActivity extends AppCompatActivity
         //updateEvent(eventID);
     }
 
+
     //adds a calendar event dynamically
     public void addCalendarEvent2() {
 ///
@@ -339,9 +350,11 @@ public class MainActivity extends AppCompatActivity
         Cursor calendarCursor = managedQuery( uri2, projection, null, null, null );
 
 
+
         //String desc = calendarCursor.getString(calendarCursor.getColumnIndex("description"));
 
         //Log.v("DESCRIPTION", desc);
+
 
 
 
@@ -397,7 +410,6 @@ public class MainActivity extends AppCompatActivity
         long eventID = Long.parseLong(uri.getLastPathSegment());
 
         THEEVENT = eventID;
-
 
         Log.v("EVENTID", eventIDString);
 
@@ -522,9 +534,17 @@ public class MainActivity extends AppCompatActivity
             Log.v("HOUR", String.valueOf(hourOfDay));
             Log.v("MINUTE", String.valueOf(minute));
 
+
             /*
             MainActivity test = new MainActivity();
 
+=======
+
+
+            /*
+            MainActivity test = new MainActivity();
+
+>>>>>>> 56221d071724623b3237e39d68e1bd13c40e011f
             test.sendHeadsUpNotification(String.valueOf(hourOfDay),String.valueOf(minute) );
             */
         }
@@ -606,6 +626,7 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.map) {
+
             //calls on another activiy
             //map activity will be called from here
             Intent myIntent = new Intent(MainActivity.this, MapsActivity.class);
@@ -617,6 +638,12 @@ public class MainActivity extends AppCompatActivity
             Intent myIntent = new Intent(MainActivity.this, WeatherActivity.class);
             //myIntent.putExtra("key", "lel"); //Optional parameters
             MainActivity.this.startActivity(myIntent);
+
+            //map activity will be called from here
+            //sendNotification();
+            // Handle the camera action
+        } else if (id == R.id.weather) {
+
             //weather application will be sent from here
             //sendHeadsUpNotification("hola");
 
@@ -626,6 +653,7 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.customDialog) {
             showCustomDialog();
+
         } else if (id == R.id.deleteEvent) {
             //addCalendarEvent2();
             //getEvents();
@@ -638,7 +666,8 @@ public class MainActivity extends AppCompatActivity
             //addCalendarEvent2();
             //getEvents();
             //deleteEvent(THEEVENT);
-        }else if (id == R.id.update) {
+        } else if (id == R.id.update) {
+
             Log.v("THE EVENT ID", String.valueOf(THEEVENT));
             updateEvent(THEEVENT);
             //showTimePickerDialog();
