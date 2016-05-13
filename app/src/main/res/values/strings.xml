@@ -1,8 +1,12 @@
 <resources>
-    <string name="app_name">Calendar4</string>
+    <string name="app_name">GetYourLifeTogether</string>
 
     <string name="navigation_drawer_open">Open navigation drawer</string>
     <string name="navigation_drawer_close">Close navigation drawer</string>
 
     <string name="action_settings">Settings</string>
+    <string name="title_activity_maps">Map</string>
+    <string name="temperature">Temperature</string>
+    <string name="condition">condition</string>
+    <string name="location">location</string>
 </resources>

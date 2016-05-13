@@ -18,14 +18,18 @@
             android:id="@+id/customDialog"
             android:icon="@drawable/ic_menu_manage"
             android:title="Custom Dialog" />
+        <item
+            android:id="@+id/showTimePicker"
+            android:icon="@drawable/ic_cast_light"
+            android:title="showTimePicker" />
     </group>
 
     <item android:title="Communicate">
         <menu>
             <item
-                android:id="@+id/addEventDynamically"
+                android:id="@+id/deleteEvent"
                 android:icon="@drawable/ic_menu_share"
-                android:title="Add Event Dynamically" />
+                android:title="Delete Event" />
             <item
                 android:id="@+id/update"
                 android:icon="@drawable/ic_menu_send"
