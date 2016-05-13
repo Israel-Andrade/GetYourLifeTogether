@@ -13,8 +13,11 @@ import android.content.Context;
 import android.content.Intent;
 import android.content.pm.PackageManager;
 import android.database.Cursor;
+import android.location.Address;
+import android.location.Geocoder;
 import android.net.Uri;
 import android.os.Bundle;
+import android.provider.BaseColumns;
 import android.provider.CalendarContract;
 import android.service.notification.NotificationListenerService;
 import android.support.design.widget.FloatingActionButton;
@@ -43,7 +46,11 @@ import android.widget.TimePicker;
 import com.google.android.gms.appindexing.Action;
 import com.google.android.gms.appindexing.AppIndex;
 import com.google.android.gms.common.api.GoogleApiClient;
+
+import java.io.IOException;
 import java.util.Calendar;
+import java.util.List;
+import java.util.Locale;
 import java.util.TimeZone;
 
 
@@ -64,10 +71,121 @@ public class MainActivity extends AppCompatActivity
     private int mMinute;
     private int sample;
 
+    static int hourFromTP = 0;
+    static int minutesFromTP = 0;
 
     private long THEEVENT = 0;
 
+    private static final String DEBUG_TAG = "ACTIVITYBRO";
+    public static final String[] INSTANCE_PROJECTION = new String[] {
+            CalendarContract.Instances.EVENT_ID,      // 0
+            CalendarContract.Instances.BEGIN,         // 1
+            CalendarContract.Instances.TITLE          // 2
+    };
 
+    public void deleteEvent(Long eventID){
+        ContentResolver cr = getContentResolver();
+        ContentValues values = new ContentValues();
+        Uri deleteUri = null;
+        deleteUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventID);
+        int rows = getContentResolver().delete(deleteUri, null, null);
+        Log.v("DELETE", "Rows deleted: " + rows);
+        Log.v("DELETE", "deleted event: " + String.valueOf(eventID));
+        sendHeadsUpNotification("DELETE", "Deleted event: "+String.valueOf(eventID) );
+    }
+    public void getEvents(){
+
+        Calendar calendar = Calendar.getInstance();
+        calendar.set(2014, Calendar.MAY, 14, 0, 0, 0);
+        long startDay = calendar.getTimeInMillis();
+        calendar.set(2014, Calendar.MAY, 14, 23, 59, 59);
+        long endDay = calendar.getTimeInMillis();
+
+        String[] projection = new String[] { BaseColumns._ID, CalendarContract.Events.TITLE, CalendarContract.Events.DTSTART };
+        String selection = CalendarContract.Events.DTSTART + " >= ? AND " + CalendarContract.Events.DTSTART + "<= ?";
+        String[] selectionArgs = new String[] { Long.toString(startDay), Long.toString(endDay) };
+
+        ContentResolver cr = getContentResolver();
+
+
+        /*
+        String[] projection = null;
+        //By default  you have the following calendars in your android phone like
+        //My Calendar, Gmail calendar,  Indian holydays or if you have installed some
+        //third party calendar app etc. They will be automatically given an unique id by OS.
+        //In the next line "selectedCalenderId" is indicating a perticular calendar like My Calendar or Gmail calendar.
+        //You need to write seperate code to get those particular calendar ids. here "selectedCalenderId" is that type of id(in my case value may be 0(My Calendar). 1(Gmail Calendar), or 3(Indian Holydays))
+        String selection = "calendar_id=" + 1 +" and dtstart between ? and ?";
+
+        long startMillis = 0;
+        long endMillis = 0;
+        Calendar beginTime = Calendar.getInstance();
+        //year, month, day, hour of day, minute, second
+        beginTime.set( 2014, 5, 11, 1, 0 );
+        startMillis = beginTime.getTimeInMillis();
+        Calendar endTime = Calendar.getInstance();
+        endTime.set( 2016, 5, 12, 1, 0 );
+        endMillis = endTime.getTimeInMillis();
+
+        //provide the time range(in system mili seconds)  from what you want to get the events.
+        String[] selectionArgs = new String[] {String.valueOf(beginTime), String.valueOf(endTime)};
+
+        Cursor cursor = null;
+
+        Uri calenderContentUri = Uri.parse("content://com.android.calendar/events");
+        try
+        {
+
+            cursor = getContentResolver().query(calenderContentUri, projection, selection, selectionArgs, "dtstart DESC, dtend DESC");
+            if (cursor.moveToFirst())
+            {
+                int increment = 0;
+
+                String eventName;
+                String calendarOwnerName;
+                String location;
+                long eventBeginTime;
+                long eventEndTime;
+
+                String description;
+                String calendarSyncId;
+
+                String customCalendarEventId ;
+
+                do
+                {
+                    eventName = cursor.getString(cursor.getColumnIndex("title"));
+                    eventBeginTime = cursor.getLong(cursor.getColumnIndex("dtstart"));
+                    eventEndTime = cursor.getLong(cursor.getColumnIndex("dtend"));
+                    location = cursor.getString(cursor.getColumnIndex("eventLocation"));
+                    calendarOwnerName = cursor.getString(cursor.getColumnIndex("ownerAccount"));
+                    description = cursor.getString(cursor.getColumnIndex("description"));
+
+                    //Watch that I am combining the 4 columns
+                    calendarSyncId = eventName +"-" +calendarOwnerName +"-" +location +"-" +eventBeginTime+"-" +eventEndTime;
+
+                    Log.v("THEM TITLES", eventName);
+                    //Making MD5 encryption to use it as unique key
+                    //customCalendarEventId =  yourMD5EncryptionLogic(calendarSyncId);
+
+                    //TODO ::: Do the rest of your coding for OS version higher than 14.
+                }
+                while(cursor.moveToNext());
+            }
+        }
+        finally  {
+            if(cursor != null) {
+                cursor.close();
+            }
+        }
+        */
+    }
+
+    public void getCoordinatesOfPlace(){
+        Geocoder geocoder = new Geocoder(getApplicationContext().getApplicationContext(), Locale.US);
+        List<Address> listOfAddress;
+
+    }
     public void showCustomDialog(){
 
         // custom dialog
@@ -117,6 +235,91 @@ public class MainActivity extends AppCompatActivity
      */
     private GoogleApiClient client;
 
+    public void addCalendarEvent3(int start) {
+        start = this.minutesFromTP;
+        ///
+        //gets the calendar
+        Uri uri2 = CalendarContract.Calendars.CONTENT_URI;
+        String[] projection = new String[]{
+                CalendarContract.Calendars._ID,
+                CalendarContract.Calendars.ACCOUNT_NAME,
+                CalendarContract.Calendars.CALENDAR_DISPLAY_NAME,
+                CalendarContract.Calendars.NAME,
+                CalendarContract.Calendars.CALENDAR_COLOR
+        };
+
+        //use this to get calendar event IDs
+        Cursor calendarCursor = managedQuery( uri2, projection, null, null, null );
+
+
+        //String desc = calendarCursor.getString(calendarCursor.getColumnIndex("description"));
+
+        //Log.v("DESCRIPTION", desc);
+
+
+
+
+
+        // Construct event details
+        long startMillis = 0;
+        long endMillis = 0;
+        Calendar beginTime = Calendar.getInstance();
+        //year, month day, hour of day, minute, second
+        beginTime.set( 2016, 9, 14, 7, 30 );
+        startMillis = beginTime.getTimeInMillis();
+        Calendar endTime = Calendar.getInstance();
+        endTime.set( 2016, 9, 14, 8, 45 );
+        endMillis = endTime.getTimeInMillis();
+
+
+// Insert Event
+        Calendar cal = Calendar.getInstance();
+
+        ContentResolver cr = getContentResolver();
+        ContentValues values = new ContentValues();
+        TimeZone timeZone = TimeZone.getDefault();
+
+        //use startMillis
+        //use endMillis
+        Log.v("STARTVALUE", String.valueOf(start));
+        values.put( CalendarContract.Events.DTSTART, cal.getTimeInMillis() + start * 60 * 1000 );
+        //start will contain the value to go forward by in minutes
+        values.put( CalendarContract.Events.DTEND, cal.getTimeInMillis() + (60+start) * 60 * 1000 );
+        values.put( CalendarContract.Events.EVENT_TIMEZONE, timeZone.getID() );
+        values.put( CalendarContract.Events.TITLE, "HAI "+ String.valueOf(cal.getTimeInMillis()) );
+        values.put( CalendarContract.Events.DESCRIPTION, "Eat all the Pizza" );
+        values.put( CalendarContract.Events.EVENT_LOCATION, "CSUMB" );
+        values.put( CalendarContract.Events.CALENDAR_ID, 1 );
+
+
+        //Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
+        //Uri uri = cr.insert( Uri.parse( "content://com.android.calendar/events" ), values );
+        if (ActivityCompat.checkSelfPermission( this, Manifest.permission.WRITE_CALENDAR ) != PackageManager.PERMISSION_GRANTED) {
+            // TODO: Consider calling
+            //    ActivityCompat#requestPermissions
+            // here to request the missing permissions, and then overriding
+            //   public void onRequestPermissionsResult(int requestCode, String[] permissions,
+            //                                          int[] grantResults)
+            // to handle the case where the user grants the permission. See the documentation
+            // for ActivityCompat#requestPermissions for more details.
+            return;
+        }
+        //inserts the event
+        Uri uri = cr.insert( CalendarContract.Events.CONTENT_URI, values );
+
+        // Retrieve ID for new event
+        String eventIDString = uri.getLastPathSegment();
+        long eventID = Long.parseLong(uri.getLastPathSegment());
+
+        THEEVENT = eventID;
+
+
+        Log.v("EVENTID", eventIDString);
+
+
+        //updateEvent(eventID);
+    }
+
     //adds a calendar event dynamically
     public void addCalendarEvent2() {
 ///
@@ -134,6 +337,13 @@ public class MainActivity extends AppCompatActivity
 
         //use this to get calendar event IDs
         Cursor calendarCursor = managedQuery( uri2, projection, null, null, null );
+
+
+        //String desc = calendarCursor.getString(calendarCursor.getColumnIndex("description"));
+
+        //Log.v("DESCRIPTION", desc);
+
+
 
 
 
@@ -188,6 +398,7 @@ public class MainActivity extends AppCompatActivity
 
         THEEVENT = eventID;
 
+
         Log.v("EVENTID", eventIDString);
 
 
@@ -205,7 +416,7 @@ public class MainActivity extends AppCompatActivity
 // The new title for the event
         values.put(CalendarContract.Events.TITLE, "Kickboxing UPDATE");
         //will update by 30 mins
-        values.put(CalendarContract.Events.DTEND, cal.getTimeInMillis() + 60 * 30 * 1000);
+        values.put(CalendarContract.Events.DTSTART, cal.getTimeInMillis() + 15 * 60 * 1000);
 
         updateUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventID);
         int rows = getContentResolver().update(updateUri, values, null, null);
@@ -287,6 +498,7 @@ public class MainActivity extends AppCompatActivity
     }
     String temp;
     //timepickerFragment
+
     public static class TimePickerFragment extends DialogFragment
             implements TimePickerDialog.OnTimeSetListener {
 
@@ -310,8 +522,6 @@ public class MainActivity extends AppCompatActivity
             Log.v("HOUR", String.valueOf(hourOfDay));
             Log.v("MINUTE", String.valueOf(minute));
 
-
-
             /*
             MainActivity test = new MainActivity();
 
@@ -333,8 +543,11 @@ public class MainActivity extends AppCompatActivity
         fab.setOnClickListener(new View.OnClickListener() {
             @Override
             public void onClick(View view) {
-                Snackbar.make(view, "Replace with your own action", Snackbar.LENGTH_LONG)
+                Snackbar.make(view, "Added New Event", Snackbar.LENGTH_LONG)
                         .setAction("Action", null).show();
+
+                //adds the event dynamically
+                addCalendarEvent2();
             }
         });
 
@@ -393,10 +606,17 @@ public class MainActivity extends AppCompatActivity
         int id = item.getItemId();
 
         if (id == R.id.map) {
+            //calls on another activiy
             //map activity will be called from here
+            Intent myIntent = new Intent(MainActivity.this, MapsActivity.class);
+            myIntent.putExtra("key", "lel"); //Optional parameters
+            MainActivity.this.startActivity(myIntent);
             //sendNotification();
             // Handle the camera action
         } else if (id == R.id.weather) {
+            Intent myIntent = new Intent(MainActivity.this, WeatherActivity.class);
+            //myIntent.putExtra("key", "lel"); //Optional parameters
+            MainActivity.this.startActivity(myIntent);
             //weather application will be sent from here
             //sendHeadsUpNotification("hola");
 
@@ -406,10 +626,19 @@ public class MainActivity extends AppCompatActivity
 
         } else if (id == R.id.customDialog) {
             showCustomDialog();
-        } else if (id == R.id.addEventDynamically) {
-            addCalendarEvent2();
+        } else if (id == R.id.deleteEvent) {
+            //addCalendarEvent2();
+            //getEvents();
+            deleteEvent(THEEVENT);
+        }else if (id == R.id.showTimePicker) {
+            showTimePickerDialog();
+            //the static variables will be populated with the timepicker values
 
-        } else if (id == R.id.update) {
+            //addCalendarEvent3(minutesFromTP);
+            //addCalendarEvent2();
+            //getEvents();
+            //deleteEvent(THEEVENT);
+        }else if (id == R.id.update) {
             Log.v("THE EVENT ID", String.valueOf(THEEVENT));
             updateEvent(THEEVENT);
             //showTimePickerDialog();
