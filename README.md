@@ -1,2 +1,3 @@
 # GetYourLifeTogether
-## bruh
+
+https://github.com/bianca-kris/GetYourLifeTogether.git
