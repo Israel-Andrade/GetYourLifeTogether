@@ -53,4 +53,20 @@
         android:layout_alignParentBottom="true"
         android:layout_centerHorizontal="true"
         android:id="@+id/imageView" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="Main"
+        android:id="@+id/mainButton"
+        android:layout_above="@+id/imageView"
+        android:layout_toStartOf="@+id/weatherIconImageView" />
+
+    <Button
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:text="MAP"
+        android:id="@+id/mapButton"
+        android:layout_above="@+id/imageView"
+        android:layout_alignStart="@+id/weatherIconImageView" />
 </RelativeLayout>

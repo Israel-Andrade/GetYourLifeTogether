@@ -8,9 +8,11 @@ import android.os.AsyncTask;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.app.FragmentActivity;
 import android.os.Bundle;
+import android.util.Log;
 import android.view.View;
 import android.widget.EditText;
 
+import com.google.android.gms.maps.CameraUpdate;
 import com.google.android.gms.maps.CameraUpdateFactory;
 import com.google.android.gms.maps.GoogleMap;
 import com.google.android.gms.maps.SupportMapFragment;
@@ -31,6 +33,20 @@ public class MapsActivity extends FragmentActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_maps);
         setUpMapIfNeeded();
+
+
+        //passing in a value from where it was called from
+        String yourDataObject = null;
+
+        if (getIntent().hasExtra("key")) {
+            yourDataObject = getIntent().getStringExtra("key");
+        } else {
+            throw new IllegalArgumentException("Activity cannot find  extras");
+        }
+
+        //logging the passed value
+        Log.v("PASS", yourDataObject);
+
     }
 
     @Override
@@ -57,8 +73,23 @@ public class MapsActivity extends FragmentActivity {
             LatLng latLng = new LatLng(address.getLatitude(), address.getLongitude());
             mMap.addMarker(new MarkerOptions().position(latLng).title("Marker"));
             mMap.animateCamera(CameraUpdateFactory.newLatLng(latLng));
+
+            //will zoom in on the point
+            ////////////////////////////
+            //CameraUpdate center= CameraUpdateFactory.newLatLng(latLng);
+            //CameraUpdate zoom=CameraUpdateFactory.zoomTo(10);
+
+            //mMap.moveCamera(center);
+            //mMap.animateCamera(zoom);
+
+            ///////
         }
     }
+
+    public void onBack(View view){
+        Log.v("TEST", "BRUH");
+    }
+
     public void onZoom(View view)
     {
         if(view.getId()== R.id.Bzoomin)

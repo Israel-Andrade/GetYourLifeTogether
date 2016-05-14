@@ -27,7 +27,7 @@
             android:text="Map Type"
             android:id="@+id/Btype"
             android:layout_gravity="right"
-            android:onClick="changeType" />
+            android:onClick="changeType"/>
     </LinearLayout>
     <LinearLayout
         android:layout_width="wrap_content"

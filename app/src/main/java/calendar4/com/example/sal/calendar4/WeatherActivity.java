@@ -1,10 +1,14 @@
 package calendar4.com.example.sal.calendar4;
 
 import android.app.ProgressDialog;
+import android.content.Intent;
 import android.graphics.drawable.Drawable;
 import android.net.Uri;
 import android.support.v7.app.AppCompatActivity;
 import android.os.Bundle;
+import android.util.Log;
+import android.view.View;
+import android.widget.Button;
 import android.widget.ImageView;
 import android.widget.TextView;
 import android.widget.Toast;
@@ -57,6 +61,24 @@ public class WeatherActivity extends AppCompatActivity implements WeatherService
         // ATTENTION: This was auto-generated to implement the App Indexing API.
         // See https://g.co/AppIndexing/AndroidStudio for more information.
         client = new GoogleApiClient.Builder(this).addApi(AppIndex.API).build();
+
+        final Button button = (Button) findViewById(R.id.mainButton);
+        final Button buttonMap = (Button) findViewById(R.id.mapButton);
+
+
+        button.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                goMain();
+            }
+        });
+
+        buttonMap.setOnClickListener(new View.OnClickListener() {
+            public void onClick(View v) {
+                // Perform action on click
+                goMap();
+            }
+        });
     }
 
     //We have two methods now
@@ -126,5 +148,20 @@ public class WeatherActivity extends AppCompatActivity implements WeatherService
         );
         AppIndex.AppIndexApi.end(client, viewAction);
         client.disconnect();
+    }
+
+    //goes back to the main activity
+    public void goMain(){
+        Log.v("BUTTON","going back");
+        Intent myIntent = new Intent(WeatherActivity.this, MainActivity.class);
+        myIntent.putExtra("key", "goMain"); //Optional parameters
+        WeatherActivity.this.startActivity(myIntent);
+    }
+
+    public void goMap(){
+        Log.v("BUTTON","going to map");
+        Intent myIntent = new Intent(WeatherActivity.this, MapsActivity.class);
+        myIntent.putExtra("key", "goMap"); //Optional parameters
+        WeatherActivity.this.startActivity(myIntent);
     }
 }

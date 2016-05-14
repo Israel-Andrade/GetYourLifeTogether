@@ -82,6 +82,8 @@ public class MainActivity extends AppCompatActivity
 
     private long THEEVENT = 0;
 
+    private static int test;
+
     private static final String DEBUG_TAG = "ACTIVITYBRO";
     public static final String[] INSTANCE_PROJECTION = new String[] {
             CalendarContract.Instances.EVENT_ID,      // 0
@@ -94,14 +96,21 @@ public class MainActivity extends AppCompatActivity
         ContentResolver cr = getContentResolver();
         ContentValues values = new ContentValues();
         Uri deleteUri = null;
+
+        //this is the call that deletes the event based on the event ID
         deleteUri = ContentUris.withAppendedId(CalendarContract.Events.CONTENT_URI, eventID);
         int rows = getContentResolver().delete(deleteUri, null, null);
+
+        //logs the task
         Log.v("DELETE", "Rows deleted: " + rows);
         Log.v("DELETE", "deleted event: " + String.valueOf(eventID));
+
+        //sends a heads up notification
         sendHeadsUpNotification("DELETE", "Deleted event: "+String.valueOf(eventID) );
     }
 
     //gets all the events of a calendar
+    //IN PROGRESS
     public void getEvents(){
         Calendar calendar = Calendar.getInstance();
         calendar.set(2014, Calendar.MAY, 14, 0, 0, 0);
@@ -189,11 +198,13 @@ public class MainActivity extends AppCompatActivity
         */
     }
 
-
-
+    //dusplays the cutsom dialog
+    //IN PROGRESS
+    //TODO: receive input from the switch and timepicker
     public void showCustomDialog(){
         // custom dialog
         final Dialog dialog = new Dialog(context);
+        //cass on the custom layout
         dialog.setContentView(R.layout.custom);
         //dialog.setTitle("Title...");
 
@@ -214,6 +225,8 @@ public class MainActivity extends AppCompatActivity
                 dialog.dismiss();
             }
         });
+
+        //TODO: DO SOMETHING WHEN THE BUTTON IS CLICKED
 
         timePicker = (TimePicker) findViewById(R.id.timePicker);
 
@@ -238,6 +251,7 @@ public class MainActivity extends AppCompatActivity
     private GoogleApiClient client;
 
 
+    //given a time, it will create an avent with the start time as minutes after the current time
     public void addCalendarEvent3(int start) {
         start = this.minutesFromTP;
         ///
@@ -353,8 +367,8 @@ public class MainActivity extends AppCompatActivity
         values.put( CalendarContract.Events.DESCRIPTION, "Eat all the Pizza" );
         values.put( CalendarContract.Events.EVENT_LOCATION, "CSUMB" );
         values.put( CalendarContract.Events.CALENDAR_ID, 1 );
-
-
+        //calendar id is 1 because that is the main calendar...
+        //TODO: be able to get all available calendars and decide onto which calndar the event will be added to
         //Uri uri = cr.insert(CalendarContract.Events.CONTENT_URI, values);
         //Uri uri = cr.insert( Uri.parse( "content://com.android.calendar/events" ), values );
         if (ActivityCompat.checkSelfPermission( this, Manifest.permission.WRITE_CALENDAR ) != PackageManager.PERMISSION_GRANTED) {
@@ -374,12 +388,11 @@ public class MainActivity extends AppCompatActivity
         String eventIDString = uri.getLastPathSegment();
         long eventID = Long.parseLong(uri.getLastPathSegment());
 
+        //THE global variable will now contain the event ID
         THEEVENT = eventID;
 
+        //will make of the log of the event number that was created
         Log.v("EVENTID", eventIDString);
-
-
-        //updateEvent(eventID);
     }
 
     //updates an event based on the event ID (long)
@@ -391,7 +404,7 @@ public class MainActivity extends AppCompatActivity
         ContentValues values = new ContentValues();
         Uri updateUri = null;
 // The new title for the event
-        values.put(CalendarContract.Events.TITLE, "Kickboxing UPDATE");
+        values.put(CalendarContract.Events.TITLE, "UPDATE");
         //will update by 30 mins
         values.put(CalendarContract.Events.DTSTART, cal.getTimeInMillis() + mins * 60 * 1000);
 
@@ -403,15 +416,18 @@ public class MainActivity extends AppCompatActivity
 
         sendHeadsUpNotification("UPDATE", String.valueOf(eventID) );
     }
+
+    //adds a calendar event with prepopulated values
     public void addCalendarEvent(){
         Calendar cal = Calendar.getInstance();
         Intent intent = new Intent(Intent.ACTION_EDIT);
         intent.setType("vnd.android.cursor.item/event");
         intent.putExtra("beginTime", cal.getTimeInMillis());
-        intent.putExtra("allDay", true);
+        //intent.putExtra("allDay", true);
         intent.putExtra("rrule", "FREQ=YEARLY");
         intent.putExtra("endTime", cal.getTimeInMillis()+60*60*1000);
-        intent.putExtra("title", "A Test Event from android app");
+        intent.putExtra("title", "Event with dialog");
+        intent.putExtra("description", "As you can see this event made us go though one extra dialog...we don't like that");
         startActivity(intent);
     }
     public void sendHeadsUpNotification(String arg, String arg2) {
@@ -584,6 +600,7 @@ public class MainActivity extends AppCompatActivity
             Intent myIntent = new Intent(MainActivity.this, MapsActivity.class);
             myIntent.putExtra("key", "lel"); //Optional parameters
             MainActivity.this.startActivity(myIntent);
+
             //sendNotification();
             // Handle the camera action
         } else if (id == R.id.weather) {
